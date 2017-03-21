@@ -27,10 +27,17 @@ $container['view'] = function ($c) {
 /**
  * Add the routes
  */
-
+// home page
 $app->get('/', function (Request $req, Response $res) {
 
     return $this->view->render($res, 'home.twig');
+});
+
+// get the URL
+$app->get('/u/{url}', function (Request $req, Response $res, $args) {
+    $url = $args['url'];
+
+    return $res;
 });
 
 return $app;
