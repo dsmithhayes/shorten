@@ -25,19 +25,38 @@ $container['view'] = function ($c) {
 };
 
 /**
- * Add the routes
+ * Add the middleware
  */
+$app->add(function (Request $req, Response $res, $next) {
+    $req = $req->withAttribute('post', $_POST)
+               ->withAttribute('get', $_GET);
+
+    return $next($req, $res);
+});
+
+/**
+ * Routes
+ */
+
 // home page
 $app->get('/', function (Request $req, Response $res) {
-
     return $this->view->render($res, 'home.twig');
-});
+})->setName('home');
+
+// build the short URL
+$app->post('/shorten', function (Request $req, Response $res) {
+    $post = $req->getAttribute('post');
+    return $this->view->render($res, 'show.twig', [
+        'url' => $post['url']
+    ]);
+})->setName('shorten');
 
 // get the URL
 $app->get('/u/{url}', function (Request $req, Response $res, $args) {
     $url = $args['url'];
 
+    // 301 to the URL
     return $res;
-});
+})->setName('getUrl');
 
 return $app;

@@ -18,5 +18,10 @@
             "name": "Dave Smith-Hayes",
             "email": "me@davesmithhayes.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "Shorten\\": "src/"
+        }
+    }
 }

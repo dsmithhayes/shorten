@@ -1,14 +1,18 @@
 {% extends 'skeleton.twig' %}
 
+{% block page_title %}Make Short(er) URLs{% endblock %}
+
 {% block header %}
-    <h1 class="title">Make Small(er) Urls</h1>
+    <h1 class="title">
+        <a href="/">Make Small(er) URLs</a>
+    </h1>
 {% endblock %}
 
 {%  block body %}
 <div class="main-form">
     <form action="/shorten" method="post">
-        <label for="url" style="display: none">Url</label>
-        <input type="text" name="url" placeholder="Url" />
+        <label for="url" style="display: none">URL</label>
+        <input type="text" name="url" placeholder="URL" />
         <button type="submit">Shorten</button>
     </form>
 </div>
