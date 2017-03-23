@@ -9,6 +9,6 @@ This was built locally and these are the tools used for it.
 
 * PHP 7
 * MySQL 5.7
-* NGiNX
+* NGiNX 1.10
 * NodeJS 6.5.0
 * NPM 3.10.3
