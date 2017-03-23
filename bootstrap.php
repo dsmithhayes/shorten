@@ -31,7 +31,6 @@ $container = $app->getContainer();
  */
 $container['view'] = function ($c) {
     $v = new Twig(__DIR__ . '/templates', []);
-
     $basePath = str_ireplace('index.php', '', $c['request']->getUri()->getBasePath());
     $basePath = rtrim($basePath, '/');
     $v->addExtension(new TwigExtension($c['router'], $basePath));
@@ -39,6 +38,9 @@ $container['view'] = function ($c) {
     return $v;
 };
 
+/**
+ * Set up the PDO instance
+ */
 $container['pdo'] = function ($c) {
     $dbConf = $c->get('settings')['db'];
     $dsn = "mysql:host={$dbConf['host']};dbname={$dbConf['dbname']}";
