@@ -4,3 +4,5 @@ composer.lock
 node_modules
 public/css
 public/js
+conf/db.php
+conf/site.php
