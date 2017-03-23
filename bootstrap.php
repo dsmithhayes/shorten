@@ -80,6 +80,7 @@ $app->post('/shorten', function (Request $req, Response $res) {
     } else {
         $h = hash('crc32', $post['url']);
         $to = $this->get('settings')['site']['url'] . 'u/' . $h;
+
         $insert = "INSERT INTO `urls` (`from`, `to`, `hash`) VALUES ('{$post['url']}', '{$to}', '{$h}')";
         $sth = $pdo->exec($insert);
 
@@ -88,7 +89,6 @@ $app->post('/shorten', function (Request $req, Response $res) {
         } else {
             throw new Exception('Error adding link to the database: ' . $pdo->errorInfo()[2]);
         }
-
     }
 
     return $this->view->render($res, 'show.twig', [
