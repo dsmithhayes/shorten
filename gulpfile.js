@@ -34,10 +34,10 @@ gulp.task('js', [ 'public' ], function () {
         .pipe(gulp.dest('./public/js'));
 });
 
-gulp.task('jquery', [ 'public' ], function() {
-    return gulp.src('./node_modules/jquery/dist/jquery.min.js')
-        .pipe(rename('jquery.js'))
+gulp.task('zepto', [ 'public' ], function() {
+    return gulp.src('./node_modules/zepto/dist/zepto.min.js')
+        .pipe(rename('zepto.js'))
         .pipe(gulp.dest('./public/js'));
 });
 
-gulp.task('default', [ 'sass', 'js', 'jquery' ]);
+gulp.task('default', [ 'sass', 'js', 'zepto' ]);

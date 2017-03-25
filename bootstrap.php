@@ -7,6 +7,9 @@ use Slim\Views\TwigExtension;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
+use Shorten\Database;
+use Shorten\Url;
+
 $conf = [
     'settings' => [
         'displayErrorDetails' => true,
@@ -42,9 +45,8 @@ $container['view'] = function ($c) {
  * Set up the PDO instance
  */
 $container['pdo'] = function ($c) {
-    $dbConf = $c->get('settings')['db'];
-    $dsn = "mysql:host={$dbConf['host']};dbname={$dbConf['dbname']}";
-    return new PDO($dsn, $dbConf['username'], $dbConf['password']);
+    $db = new Database($c->settings['db']);
+    return $db->getPdo();
 };
 
 /**
@@ -71,23 +73,25 @@ $app->get('/', function (Request $req, Response $res) {
 // build the short URL
 $app->post('/shorten', function (Request $req, Response $res) {
     $post = $req->getAttribute('post');
-
     $pdo = $this->get('pdo');
 
+    $url = new Url($this->settings['site']['url'], $post['url']);
+
     $sth = $pdo->prepare("SELECT * FROM `urls` WHERE `from` = :url");
-    $sth->execute([ ':url' => $post['url'] ]);
+    $sth->execute([ ':url' => $url->getFromUrl() ]);
 
     if (($row = $sth->fetch())) {
         $url = $row['to'];
     } else {
-        $h = hash('crc32', $post['url']);
-        $to = $this->get('settings')['site']['url'] . 'u/' . $h;
+        $insert = "INSERT INTO `urls` (`from`, `to`, `hash`) 
+                   VALUES ('{$url->getFromUrl()}', 
+                           '{$url->getToUrl()}', 
+                           '{$url->getHash()}')";
 
-        $insert = "INSERT INTO `urls` (`from`, `to`, `hash`) VALUES ('{$post['url']}', '{$to}', '{$h}')";
         $sth = $pdo->exec($insert);
 
         if ($sth) {
-            $url = $to;
+            $url = $url->getToUrl();
         } else {
             throw new Exception('Error adding link to the database: ' . $pdo->errorInfo()[2]);
         }
@@ -112,8 +116,23 @@ $app->get('/u/{url}', function (Request $req, Response $res, $args) {
         return $res->withStatus(500)->getBody()->write('Link does not exist.');
     }
 
-    return $res->withStatus(301)->withHeader('Location', $from);
+    $insert = "INSERT INTO `logs` (`url_id`) VALUES (`{$row['id']}`)";
+    $res = $pdo->exec($insert);
+
+    if (!$res) {
+        throw new Exception('Error logging the redirect.');
+    }
+
+    return $res->withStatus(302)->withHeader('Location', $from);
 })->setName('getUrl');
+
+$app->get('/list[/page/{n}]', function (Request $req, Response $res, $args) {
+    if ($args['n']) {
+        $pageNumber = (int) $args['n'];
+    }
+
+    return $this->view->render($res, 'home.twig');
+});
 
 // Return the application to the front controller
 return $app;

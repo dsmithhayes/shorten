@@ -4,4 +4,4 @@
         document.execCommand('copy');
         return false;
     });
-})(window.jQuery);
+})(window.Zepto);
